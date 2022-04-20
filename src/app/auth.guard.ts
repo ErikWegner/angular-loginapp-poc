@@ -23,6 +23,12 @@ export class AuthGuard implements CanActivate {
     | UrlTree {
     const hasValidAccessToken = this.oAuthService.hasValidAccessToken();
     console.debug(`AuthGuard: hasValidAccessToken = ${hasValidAccessToken}`);
-    return hasValidAccessToken;
+    if (hasValidAccessToken) {
+      return true;
+    } else {
+      this.oAuthService.initCodeFlow('goto protected page');
+    }
+
+    return false;
   }
 }
