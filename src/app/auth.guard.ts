@@ -26,7 +26,7 @@ export class AuthGuard implements CanActivate {
     if (hasValidAccessToken) {
       return true;
     } else {
-      this.oAuthService.initCodeFlow('goto protected page');
+      this.oAuthService.initCodeFlow(state.url);
     }
 
     return false;
