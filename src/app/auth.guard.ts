@@ -5,14 +5,14 @@ import {
   RouterStateSnapshot,
   UrlTree,
 } from '@angular/router';
-import { OAuthService } from 'angular-oauth2-oidc';
 import { Observable } from 'rxjs';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private oAuthService: OAuthService) {}
+  constructor(private auth: AuthService) {}
   canActivate(
     route: ActivatedRouteSnapshot,
     state: RouterStateSnapshot
@@ -21,12 +21,12 @@ export class AuthGuard implements CanActivate {
     | Promise<boolean | UrlTree>
     | boolean
     | UrlTree {
-    const hasValidAccessToken = this.oAuthService.hasValidAccessToken();
+    const hasValidAccessToken = this.auth.hasValidAccessToken();
     console.debug(`AuthGuard: hasValidAccessToken = ${hasValidAccessToken}`);
     if (hasValidAccessToken) {
       return true;
     } else {
-      this.oAuthService.initCodeFlow(state.url);
+      this.auth.login(state.url);
     }
 
     return false;

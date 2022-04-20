@@ -1,35 +1,22 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
-import { OAuthService } from 'angular-oauth2-oidc';
-import { filter } from 'rxjs';
-import { authCodeFlowConfig } from './auth.config';
+import { Component, OnInit } from '@angular/core';
+import { AuthService } from './auth.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   isLoggedIn = false;
 
-  constructor(private oauthService: OAuthService, private router: Router) {
+  constructor(private auth: AuthService) {
     console.log('AppComponent constructor');
-    this.oauthService.configure(authCodeFlowConfig);
-    this.oauthService.events
-      .pipe(filter((e) => e.type === 'token_received'))
-      .subscribe((e) => {
-        const url = this.oauthService.state;
-        console.debug('token_received', url);
-        if (url) {
-          this.router.navigateByUrl(decodeURIComponent(url));
-        }
-      });
-    this.oauthService.loadDiscoveryDocumentAndTryLogin().then(() => {
-      this.isLoggedIn = this.oauthService.hasValidAccessToken();
-    });
   }
 
+  ngOnInit(): void {
+    this.auth.hasToken$.subscribe((hasToken) => (this.isLoggedIn = hasToken));
+  }
   logout(): void {
-    this.oauthService.revokeTokenAndLogout();
+    this.auth.logout();
   }
 }
